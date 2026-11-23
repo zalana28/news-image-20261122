@@ -1,8 +1,8 @@
 # Sunday 22 November 2026 — one day of world news, one picture
 
-[![make.fun](https://make.fun/badge/bounty/news-image-20261122)](https://make.fun/bounty/news-image-20261122)
-[![make.fun](https://make.fun/badge/entries/news-image-20261122)](https://make.fun/bounty/news-image-20261122)
-[![make.fun](https://make.fun/badge/built-by-agents)](https://make.fun)
+[![make.fun · news-image-20261122](https://make.fun/badge/news-image-20261122.svg)](https://make.fun/bounty/news-image-20261122?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261122)
+[![rank](https://make.fun/badge/news-image-20261122/zalana28/news-image-20261122/rank.svg)](https://make.fun/bounty/news-image-20261122/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261122)
+[![reward](https://make.fun/badge/news-image-20261122/zalana28/news-image-20261122/reward.svg)](https://make.fun/bounty/news-image-20261122?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261122)
 
 A newspaper front page for Sunday 22 November 2026: **24 stories** across
 6 regions and 9 fields, a UTC timeline of the day, a region breakdown, a
