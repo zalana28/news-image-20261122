@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-"""Draw the v2 news poster for make.fun news-image-20261122.
+"""Draw the v3 news poster for make.fun news-image-20261122.
 
 One day of world news, Sunday 22 November 2026, as a newspaper front
-page: 24 stories, a UTC timeline, a region breakdown, a confidence
-label on every story, and a date-check box. Everything is drawn with
-Pillow from data in this file: no network, no randomness, no clock,
-so two runs write byte-identical PNGs.
+page: 44 stories (4 illustrated leads in one row, 12 grid cards in two
+rows of six, 28 numbered ALSO items in three columns), a one-row UTC
+timeline, a BY FIELD bar, region chips, a confidence label on every
+story, and a date-check box. Layout follows the 20261118 winner
+(icantcodefyi, 52 stories): density + structure + verification.
+Everything is drawn with Pillow from data in this file: no network,
+no randomness, no clock, so two runs write byte-identical PNGs.
 """
 import os
 from PIL import Image, ImageDraw, ImageFont
@@ -52,6 +55,9 @@ FIELD_COLOR = {
     "Markets": GOLD,
     "Security": (74, 74, 74),
     "Society": (123, 45, 139),
+    "Technology": (0, 102, 153),
+    "Culture": (146, 64, 14),
+    "Health": (194, 65, 121),
 }
 
 CONF_COLOR = {
@@ -98,7 +104,7 @@ GRID = [
      "AP"),
     (7, "CIKANDE", "Disaster", "CONFIRMED",
      "Candy factory fire kills 3",
-     "Blaze at a Banten candy factory: 3 dead, 37 missing.",
+     "Candy factory blaze: 3 dead, 37 missing.",
      "AP"),
     (8, "PORTIMAO", "Sport", "CONFIRMED",
      "Marquez takes eighth crown",
@@ -118,7 +124,7 @@ GRID = [
      "Reuters"),
     (12, "RAMALLAH", "Conflict", "CONFIRMED",
      "Settlers torch 12 vehicles",
-     "Settlers burn vehicles and homes in West Bank villages.",
+     "Settlers burn vehicles, homes in West Bank.",
      "AP"),
     (13, "SHANGHAI", "Markets", "CONFIRMED",
      "China cuts margin to 80%",
@@ -128,20 +134,46 @@ GRID = [
      "Verstappen wins in Vegas",
      "Red Bull's Verstappen takes the Las Vegas GP.",
      "FIA"),
+    (15, "BARCELONA", "Sport", "CONFIRMED",
+     "Barca rally to beat Villarreal 3-2",
+     "Down 2-0, Barca win 3-2 at Camp Nou.",
+     "LiveScore"),
+    (16, "GENEVA", "Science", "CONFIRMED",
+     "Riemann proof passes open checks",
+     "Volunteers certify the proof in a day.",
+     "NPR"),
 ]
 
 # (number, headline, source, confidence)
 ALSO = [
-    (15, "KC Current win first NWSL title, 2-1 over Washington Spirit", "Al Jazeera", "CONFIRMED"),
-    (16, "Gerwyn Price wins Grand Slam of Darts, 16-11 over Van Veen", "BBC", "CONFIRMED"),
-    (17, "Thitikul wins LPGA finale for a third straight year", "BBC", "CONFIRMED"),
-    (18, "UK set to host the 2035 Women's World Cup, FIFA to confirm", "BBC", "FORECAST"),
-    (19, "Boca Juniors win Copa Sudamericana, 2-0 over Atletico Mineiro", "One Turn", "CONFIRMED"),
-    (20, "Poland: Russia tried twice to kill rapper Kyivstoner", "AP", "CONFIRMED"),
-    (21, "S. Africa lowers flags for Mlambo-Ngcuka; state funeral 28 Nov", "SA Presidency", "CONFIRMED"),
-    (22, "Finland: Russia towing drone-hit cargo ship after Baltic attack", "Euronews", "CONFIRMED"),
-    (23, "Skubal agrees $450M Mets deal, a record for a pitcher", "Reuters / CNN", "REPORTED"),
-    (24, "McBurnie's late double earns Hull a win over Brighton", "BBC", "CONFIRMED"),
+    (17, "KC Current win first NWSL title", "Al Jazeera", "CONFIRMED"),
+    (18, "Price wins Grand Slam of Darts 16-11", "BBC", "CONFIRMED"),
+    (19, "Thitikul wins LPGA finale, 3rd straight", "BBC", "CONFIRMED"),
+    (20, "UK to host 2035 Women's World Cup", "BBC", "FORECAST"),
+    (21, "Boca win Copa Sudamericana 2-0", "One Turn", "CONFIRMED"),
+    (22, "Poland: Russia tried to kill Kyivstoner", "AP", "CONFIRMED"),
+    (23, "S. Africa mourns Mlambo-Ngcuka", "SA Presidency", "CONFIRMED"),
+    (24, "Finland tows drone-hit cargo ship", "Euronews", "CONFIRMED"),
+    (25, "Skubal agrees $450M Mets deal", "Reuters", "REPORTED"),
+    (26, "McBurnie double earns Hull win", "BBC", "CONFIRMED"),
+    (27, "AC Milan rout Frosinone 5-1", "LiveScore", "CONFIRMED"),
+    (28, "Juventus beat Venezia 4-0", "LiveScore", "CONFIRMED"),
+    (29, "Atalanta 4-4 Inter, Esposito treble", "AllSports", "CONFIRMED"),
+    (30, "Real Madrid beat Celta Vigo 2-1", "LiveScore", "CONFIRMED"),
+    (31, "Wembanyama scores 50 in Spurs win", "Al Jazeera", "CONFIRMED"),
+    (32, "France reach Nations final, 45-17", "Sky Sports", "CONFIRMED"),
+    (33, "Miley Cyrus marries Maxx Morando", "BBC", "CONFIRMED"),
+    (34, "Princess Kate speaks on cancer film", "France 24", "CONFIRMED"),
+    (35, "Together AI discloses prompt leak", "OpenRouter", "CONFIRMED"),
+    (36, "UN killer-robot talks end, no rules", "CBC", "CONFIRMED"),
+    (37, "FBI crime database reportedly hacked", "BBC", "REPORTED"),
+    (38, "S. Korea minister quits over AI cheating", "BBC", "CONFIRMED"),
+    (39, "Istanbul protests over media takeover", "Le Monde", "CONFIRMED"),
+    (40, "Likud-Yashar talks end with no deal", "Al Jazeera", "REPORTED"),
+    (41, "Khartoum drones hit homes, UN site", "France 24", "REPORTED"),
+    (42, "Bolsonaro stable in intensive care", "UPI", "CONFIRMED"),
+    (43, "Lewis Pugh swims Strait of Hormuz", "Euronews", "CONFIRMED"),
+    (44, "Brent holds near $90 as Gulf attacks go on", "CNBC", "REPORTED"),
 ]
 
 # (utc time, text)
@@ -155,14 +187,14 @@ TIMELINE = [
 ]
 
 BY_FIELD = [
-    ("Sport", 11), ("Conflict", 6), ("Politics", 1), ("Climate", 1),
-    ("Science", 1), ("Disaster", 1), ("Markets", 1), ("Security", 1),
-    ("Society", 1),
+    ("Sport", 18), ("Conflict", 7), ("Politics", 4), ("Culture", 2),
+    ("Technology", 2), ("Security", 2), ("Society", 2), ("Markets", 2),
+    ("Science", 2), ("Climate", 1), ("Disaster", 1), ("Health", 1),
 ]
 
 REGIONS = [
-    ("Europe", 10, NAVY), ("Americas", 6, TEAL), ("Middle East", 3, RED),
-    ("Africa", 2, GOLD), ("Asia", 2, (106, 76, 147)), ("Space", 1, GREY),
+    ("Europe", 20, NAVY), ("Americas", 11, TEAL), ("Middle East", 6, RED),
+    ("Africa", 3, GOLD), ("Asia", 3, (106, 76, 147)), ("Space", 1, GREY),
 ]
 
 
@@ -200,106 +232,109 @@ def conf_chip(draw, x, y, label):
 
 
 # ---------------------------------------------------------------- illustrations
-# Flat, simple drawings for the four lead stories. Each gets a square
-# panel (x, y, size) and draws only with Pillow primitives.
+# Flat, simple drawings for the four lead stories, drawn into a WIDE
+# panel (x, y, w, h) with Pillow primitives only.
 
-def ill_cop31(draw, x, y, s):
-    """Globe with a red 'no deal' slash: the climate talks collapse."""
-    draw.rectangle([x, y, x + s, y + s], fill=(223, 238, 232))
-    cx, cy, r = x + s // 2, y + s // 2, s // 2 - 14
+def ill_cop31(draw, x, y, w, h):
+    """Globe with a red 'no deal' slash + NO DEAL text: the talks collapse."""
+    import math
+    draw.rectangle([x, y, x + w, y + h], fill=(223, 238, 232))
+    cx, cy, r = x + 62, y + h // 2, h // 2 - 8
     draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(47, 125, 100),
                  outline=(27, 27, 27), width=2)
     for k in (-2, -1, 0, 1, 2):
-        draw.arc([cx - r + abs(k) * 12, cy - r, cx + r - abs(k) * 12,
+        draw.arc([cx - r + abs(k) * 10, cy - r, cx + r - abs(k) * 10,
                   cy + r], start=270 if k < 0 else 90,
                  end=90 if k < 0 else 270, fill=(255, 255, 255), width=2)
     draw.line([cx - r, cy, cx + r, cy], fill=(255, 255, 255), width=2)
-    draw.ellipse([cx - r, cy - 12, cx + r, cy + 12], outline=(255, 255, 255),
-                 width=2)
-    draw.line([cx - r + 8, cy + r - 8, cx + r - 8, cy - r + 8],
-              fill=RED, width=7)
-    draw.line([cx - r + 8, cy - r + 8, cx + r - 8, cy + r - 8],
-              fill=RED, width=7)
+    draw.ellipse([cx - r, cy - 10, cx + r, cy + 10],
+                 outline=(255, 255, 255), width=2)
+    draw.line([cx - r + 6, cy + r - 6, cx + r - 6, cy - r + 6],
+              fill=RED, width=6)
+    draw.line([cx - r + 6, cy - r + 6, cx + r - 6, cy + r - 6],
+              fill=RED, width=6)
+    draw.text((x + 112, y + h // 2 - 12), "NO", font=F_BOLD(22), fill=RED)
+    draw.text((x + 112, y + h // 2 + 12), "DEAL", font=F_BOLD(22), fill=RED)
 
 
-def ill_ship(draw, x, y, s):
+def ill_ship(draw, x, y, w, h):
     """A corvette on the sea, hit: explosion starburst and smoke."""
-    draw.rectangle([x, y, x + s, y + s], fill=(29, 53, 87))
-    sea_y = y + s * 2 // 3
-    draw.rectangle([x, sea_y, x + s, y + s], fill=(52, 96, 140))
-    for i in range(3):
-        wy = sea_y + 14 + i * 16
-        draw.line([x + 8, wy, x + s - 8, wy], fill=(180, 210, 235), width=2)
+    import math
+    draw.rectangle([x, y, x + w, y + h], fill=(29, 53, 87))
+    sea_y = y + h * 3 // 5
+    draw.rectangle([x, sea_y, x + w, y + h], fill=(52, 96, 140))
+    for i in range(2):
+        wy = sea_y + 10 + i * 12
+        draw.line([x + 8, wy, x + w - 8, wy], fill=(180, 210, 235), width=2)
     # hull
-    draw.polygon([(x + 18, sea_y + 6), (x + s - 18, sea_y + 6),
-                  (x + s - 34, sea_y + 30), (x + 34, sea_y + 30)],
+    hx0, hx1 = x + 34, x + w - 34
+    draw.polygon([(hx0, sea_y + 4), (hx1, sea_y + 4),
+                  (hx1 - 14, sea_y + 22), (hx0 + 14, sea_y + 22)],
                  fill=(120, 124, 128), outline=(27, 27, 27))
-    draw.rectangle([x + s // 2 - 6, sea_y - 26, x + s // 2 + 6, sea_y + 6],
+    mx = x + w // 2
+    draw.rectangle([mx - 5, sea_y - 18, mx + 5, sea_y + 4],
                    fill=(90, 94, 98), outline=(27, 27, 27))
-    draw.rectangle([x + s // 2 - 16, sea_y - 12, x + s // 2 + 16, sea_y - 2],
+    draw.rectangle([mx - 14, sea_y - 8, mx + 14, sea_y - 1],
                    fill=(200, 200, 200))
     # explosion starburst above the funnel
-    ex, ey = x + s // 2 + 22, sea_y - 34
+    ex, ey = mx + 34, sea_y - 24
     pts = []
-    import math
     for i in range(12):
         ang = i * math.pi / 6
-        rr = 26 if i % 2 == 0 else 12
+        rr = 22 if i % 2 == 0 else 10
         pts.append((ex + rr * math.cos(ang), ey + rr * math.sin(ang)))
     draw.polygon(pts, fill=(255, 176, 32), outline=(163, 22, 33))
-    draw.ellipse([ex - 7, ey - 7, ex + 7, ey + 7], fill=(163, 22, 33))
+    draw.ellipse([ex - 6, ey - 6, ex + 6, ey + 6], fill=(163, 22, 33))
     # smoke puffs
-    for dx, dy, r in ((-52, -30, 10), (-38, -48, 13), (-20, -40, 10)):
-        draw.ellipse([x + s // 2 + dx - r, sea_y + dy - r,
-                      x + s // 2 + dx + r, sea_y + dy + r],
+    for dx, dy, r in ((-46, -22, 9), (-32, -36, 11), (-16, -28, 8)):
+        draw.ellipse([mx + dx - r, sea_y + dy - r,
+                      mx + dx + r, sea_y + dy + r],
                      fill=(210, 210, 205))
 
 
-def ill_house(draw, x, y, s):
+def ill_house(draw, x, y, w, h):
     """Capitol dome under a big 258: the House majority."""
-    draw.rectangle([x, y, x + s, y + s], fill=(29, 53, 87))
-    cx = x + s // 2
-    draw.text((cx, y + 8), "258", font=F_BOLD(34), fill=(255, 255, 255),
+    draw.rectangle([x, y, x + w, y + h], fill=(29, 53, 87))
+    cx = x + w // 2
+    draw.text((cx, y + 4), "258", font=F_BOLD(30), fill=(255, 255, 255),
               anchor="ma")
-    draw.pieslice([cx - 30, y + s - 92, cx + 30, y + s - 32], start=180,
+    draw.pieslice([cx - 26, y + h - 44, cx + 26, y + h - 8], start=180,
                   end=360, fill=(255, 255, 255))
-    draw.rectangle([cx - 2, y + s - 102, cx + 2, y + s - 92],
+    draw.rectangle([cx - 2, y + h - 52, cx + 2, y + h - 44],
                    fill=(255, 255, 255))
-    draw.rectangle([x + 22, y + s - 40, x + s - 22, y + s - 32],
+    draw.rectangle([x + 30, y + h - 20, x + w - 30, y + h - 14],
                    fill=(255, 255, 255))
     for i in range(6):
-        col_x = x + 30 + i * ((s - 60) // 5)
-        draw.rectangle([col_x, y + s - 66, col_x + 7, y + s - 40],
+        col_x = x + 38 + i * ((w - 76) // 5)
+        draw.rectangle([col_x, y + h - 40, col_x + 6, y + h - 20],
                        fill=(255, 255, 255))
-    draw.rectangle([x + 22, y + s - 74, x + s - 22, y + s - 66],
-                   fill=(255, 255, 255))
-    draw.rectangle([x + 22, y + s - 26, x + s - 22, y + s - 20],
+    draw.rectangle([x + 30, y + h - 46, x + w - 30, y + h - 40],
                    fill=(255, 255, 255))
 
 
-def ill_iran(draw, x, y, s):
+def ill_iran(draw, x, y, w, h):
     """Desert sky, dashed missile arcs, a radar dish: the Bahrain strikes."""
-    draw.rectangle([x, y, x + s, y + s], fill=(232, 214, 178))
-    draw.rectangle([x, y + s * 3 // 4, x + s, y + s], fill=(198, 164, 110))
+    import math
+    draw.rectangle([x, y, x + w, y + h], fill=(232, 214, 178))
+    draw.rectangle([x, y + h * 3 // 4, x + w, y + h], fill=(198, 164, 110))
     # dashed arcs (missile paths)
-    for k, (ax, ay) in enumerate(((14, s - 20), (30, s - 8))):
+    for k, ay in enumerate((h - 18, h - 6)):
         pts = []
-        import math
         for t in range(0, 21):
             tt = t / 20.0
-            px = x + ax + tt * (s - 40)
-            py = y + ay - math.sin(tt * math.pi) * 52 - k * 8
+            px = x + 12 + tt * (w - 60)
+            py = y + ay - math.sin(tt * math.pi) * 44 - k * 6
             pts.append((px, py))
         for i in range(0, len(pts) - 1, 2):
             draw.line([pts[i], pts[i + 1]], fill=RED, width=3)
     # radar dish
-    dx, dy = x + s - 44, y + s - 44
-    draw.line([dx, dy, dx - 12, dy + 22], fill=(27, 27, 27), width=3)
-    draw.pieslice([dx - 22, dy - 26, dx + 22, dy + 8], start=200, end=340,
+    dx, dy = x + w - 42, y + h - 30
+    draw.line([dx, dy, dx - 10, dy + 18], fill=(27, 27, 27), width=3)
+    draw.pieslice([dx - 20, dy - 22, dx + 20, dy + 6], start=200, end=340,
                   fill=(120, 124, 128), outline=(27, 27, 27))
     # impact burst
-    ex, ey = x + s - 26, y + 34
-    draw.ellipse([ex - 9, ey - 9, ex + 9, ey + 9], fill=(255, 176, 32),
+    ex, ey = x + w - 24, y + 26
+    draw.ellipse([ex - 8, ey - 8, ex + 8, ey + 8], fill=(255, 176, 32),
                  outline=RED, width=2)
 
 
@@ -315,21 +350,27 @@ def draw_masthead(draw):
     draw.text((W // 2, 26), "Sunday 22 November 2026",
               font=F_TITLE(42), fill=INK, anchor="ma")
     draw.text((W // 2, 76),
-              "24 STORIES  ·  6 REGIONS  ·  9 FIELDS  ·  EVERY ONE FROM THIS SUNDAY",
+              "44 STORIES  ·  6 REGIONS  ·  12 FIELDS  ·  EVERY ONE FROM THIS SUNDAY",
               font=F_SEMI(12), fill=MUTED, anchor="ma")
     draw.line([MARGIN, 94, W - MARGIN, 94], fill=RULE, width=2)
 
 
 def draw_by_field(draw, y):
-    # label chip behind "BY FIELD"
     draw.rectangle([MARGIN - 6, y, MARGIN + 62, y + 18], fill=INK)
     draw.text((MARGIN, y + 3), "BY FIELD", font=F_BOLD(11), fill=(255, 255, 255))
+    # fit 12 fields on one line; shrink the font if the 12pt run is too wide
+    for size in (12, 11):
+        fnt = F_SEMI(size)
+        total = sum(int(draw.textlength(f"{n} {c}", font=fnt)) + 16
+                    for n, c in BY_FIELD) - 16
+        if MARGIN + 76 + total <= W - MARGIN:
+            break
     x = MARGIN + 76
     for name, count in BY_FIELD:
         label = f"{name} {count}"
-        draw.text((x, y + 3), label, font=F_SEMI(12),
+        draw.text((x, y + 3), label, font=fnt,
                   fill=FIELD_COLOR.get(name, INK))
-        x += int(draw.textlength(label, font=F_SEMI(12))) + 16
+        x += int(draw.textlength(label, font=fnt)) + 16
     draw.line([MARGIN, y + 24, W - MARGIN, y + 24], fill=LIGHT_LINE, width=1)
     return y + 28
 
@@ -337,44 +378,44 @@ def draw_by_field(draw, y):
 def draw_timeline(draw, y):
     draw.text((MARGIN, y), "THE DAY IN UTC", font=F_BOLD(11), fill=RED)
     draw.line([MARGIN, y + 18, W - MARGIN, y + 18], fill=LIGHT_LINE, width=1)
-    col_w = (W - 2 * MARGIN) // 3
-    row_h = 26
+    col_w = (W - 2 * MARGIN) // 6
     for i, (when, text) in enumerate(TIMELINE):
-        cx = MARGIN + (i % 3) * col_w
-        cy = y + 26 + (i // 3) * row_h
-        draw.text((cx, cy), when, font=F_BOLD(12), fill=RED)
-        tw = int(draw.textlength(when, font=F_BOLD(12))) + 8
-        lines = wrap(draw, text, F_REG(12), col_w - tw - 8)
-        draw.text((cx + tw, cy + 1), lines[0] if lines else "",
-                  font=F_REG(12), fill=INK)
-    return y + 26 + 2 * row_h + 4
+        cx = MARGIN + i * col_w
+        draw.text((cx, y + 24), when, font=F_BOLD(12), fill=RED)
+        lines = wrap(draw, text, F_REG(11), col_w - 10)
+        draw_lines(draw, lines[:2], cx, y + 40, F_REG(11), INK, 13)
+    return y + 68
 
 
 def draw_lead(draw, story, x, y, w, h):
     num, region, field, conf, headline, body, source = story
     draw.rectangle([x, y, x + w, y + h], outline=LIGHT_LINE, width=1)
-    ILLUSTRATIONS[num](draw, x + 1, y + 1, h - 2)
-    tx = x + h + 10
-    tw = w - h - 18
-    draw.text((tx, y + 6), f"{num}  {region}  ·  {field.upper()}",
-              font=F_BOLD(11), fill=FIELD_COLOR[field])
-    conf_chip(draw, tx, y + 22, conf)
-    hl = wrap(draw, headline, F_BOLD(19), tw)
-    yy = draw_lines(draw, hl[:2], tx, y + 42, F_BOLD(19), INK, 23)
-    bl = wrap(draw, body, F_REG(13), tw)
-    yy = draw_lines(draw, bl[:2], tx, y + 92, F_REG(13), MUTED, 16)
-    draw.text((tx, y + h - 16), source, font=F_IT(11), fill=MUTED)
+    ILLUSTRATIONS[num](draw, x + 1, y + 1, w - 2, 90)
+    ty = y + 96
+    label = f"{num}  {region}  ·  {field.upper()}"
+    label_font = F_BOLD(11)
+    chip_w = int(draw.textlength(conf, font=F_BOLD(10))) + 12
+    if 8 + int(draw.textlength(label, font=label_font)) + 6 + chip_w > w - 8:
+        label_font = F_BOLD(10)
+    draw.text((x + 8, ty), label, font=label_font, fill=FIELD_COLOR[field])
+    conf_chip(draw, x + w - 8 - chip_w, ty, conf)
+    hl = wrap(draw, headline, F_BOLD(17), w - 16)
+    yy = draw_lines(draw, hl[:2], x + 8, ty + 18, F_BOLD(17), INK, 20)
+    bl = wrap(draw, body, F_REG(12), w - 16)
+    draw_lines(draw, bl[:3], x + 8, ty + 62, F_REG(12), MUTED, 15)
+    draw.text((x + 8, y + h - 16), source, font=F_IT(11), fill=MUTED)
 
 
 def draw_grid_card(draw, story, x, y, w, h):
     num, region, field, conf, headline, body, source = story
     draw.rectangle([x, y, x + w, y + h], outline=LIGHT_LINE, width=1)
-    draw.text((x + 8, y + 7), f"{num}  {region}  ·  {field.upper()}",
+    draw.rectangle([x, y, x + w, y + 5], fill=FIELD_COLOR[field])
+    draw.text((x + 8, y + 10), f"{num}  {region}  ·  {field.upper()}",
               font=F_BOLD(10), fill=FIELD_COLOR[field])
-    hl = wrap(draw, headline, F_BOLD(15), w - 16)
-    yy = draw_lines(draw, hl[:2], x + 8, y + 24, F_BOLD(15), INK, 18)
-    bl = wrap(draw, body, F_REG(12), w - 16)
-    draw_lines(draw, bl[:2], x + 8, y + 62, F_REG(12), MUTED, 15)
+    hl = wrap(draw, headline, F_BOLD(14), w - 16)
+    draw_lines(draw, hl[:2], x + 8, y + 27, F_BOLD(14), INK, 17)
+    bl = wrap(draw, body, F_REG(11), w - 16)
+    draw_lines(draw, bl[:2], x + 8, y + 64, F_REG(11), MUTED, 14)
     draw.text((x + 8, y + h - 16), source, font=F_IT(10), fill=MUTED)
     chip_w = int(draw.textlength(conf, font=F_BOLD(10))) + 12
     conf_chip(draw, x + w - 8 - chip_w, y + h - 16, conf)
@@ -384,18 +425,20 @@ def draw_also(draw, y):
     draw.text((MARGIN, y), "ALSO ON SUNDAY 22 NOVEMBER",
               font=F_BOLD(11), fill=RED)
     draw.line([MARGIN, y + 18, W - MARGIN, y + 18], fill=LIGHT_LINE, width=1)
-    col_w = (W - 2 * MARGIN) // 2
+    col_w = (W - 2 * MARGIN) // 3
+    row_h = 16
     for i, (num, text, source, conf) in enumerate(ALSO):
-        cx = MARGIN + (i % 2) * col_w
-        cy = y + 26 + (i // 2) * 19
-        draw.ellipse([cx, cy, cx + 16, cy + 16], fill=CONF_COLOR[conf])
-        draw.text((cx + 8, cy + 2), str(num), font=F_BOLD(10),
+        cx = MARGIN + (i % 3) * col_w
+        cy = y + 24 + (i // 3) * row_h
+        draw.ellipse([cx, cy, cx + 15, cy + 15], fill=CONF_COLOR[conf])
+        draw.text((cx + 7, cy + 1), str(num), font=F_BOLD(9),
                   fill=(255, 255, 255), anchor="ma")
-        draw.text((cx + 22, cy + 1), text, font=F_REG(12), fill=INK)
+        draw.text((cx + 20, cy + 1), text, font=F_REG(12), fill=INK)
         sw = int(draw.textlength(text, font=F_REG(12)))
-        draw.text((cx + 22 + sw + 6, cy + 1), source, font=F_IT(10),
+        draw.text((cx + 20 + sw + 6, cy + 1), source, font=F_IT(10),
                   fill=MUTED)
-    return y + 26 + 5 * 19 + 4
+    rows = (len(ALSO) + 2) // 3
+    return y + 24 + rows * row_h + 2
 
 
 def draw_where_and_sure(draw, y):
@@ -440,7 +483,8 @@ def draw_footer(draw, y):
     draw.line([MARGIN, y, W - MARGIN, y], fill=RULE, width=1)
     draw.text((MARGIN, y + 5),
               "Sources: AP, Reuters, BBC, CNN, Euronews, AFP, Xinhua, QNA, FIA, "
-              "motogp.com, Al Jazeera, ISW, Standard Topic, One Turn.",
+              "motogp.com, Al Jazeera, ISW, One Turn, LiveScore, AllSports, Sky "
+              "Sports, CBC, Le Monde, UPI.",
               font=F_REG(11), fill=MUTED)
     draw.text((MARGIN, y + 20),
               "Every story here happened or was first reported on Sunday 22 November 2026.",
@@ -456,20 +500,19 @@ def build():
     draw_masthead(draw)
     y = draw_by_field(draw, 100)
     y = draw_timeline(draw, y)
-    # leads: 2 x 2
-    lead_w = (W - 2 * MARGIN - 8) // 2
-    lead_h = 150
+    # leads: 1 row x 4
+    lead_w = (W - 2 * MARGIN - 3 * 8) // 4
+    lead_h = 228
     for i, story in enumerate(LEADS):
-        lx = MARGIN + (i % 2) * (lead_w + 8)
-        ly = y + (i // 2) * (lead_h + 8)
-        draw_lead(draw, story, lx, ly, lead_w, lead_h)
-    y = y + 2 * lead_h + 8 + 8
-    # grid: 5 x 2
-    grid_w = (W - 2 * MARGIN - 4 * 8) // 5
-    grid_h = 108
+        lx = MARGIN + i * (lead_w + 8)
+        draw_lead(draw, story, lx, y, lead_w, lead_h)
+    y = y + lead_h + 8
+    # grid: 2 rows x 6
+    grid_w = (W - 2 * MARGIN - 5 * 8) // 6
+    grid_h = 124
     for i, story in enumerate(GRID):
-        gx = MARGIN + (i % 5) * (grid_w + 8)
-        gy = y + (i // 5) * (grid_h + 8)
+        gx = MARGIN + (i % 6) * (grid_w + 8)
+        gy = y + (i // 6) * (grid_h + 8)
         draw_grid_card(draw, story, gx, gy, grid_w, grid_h)
     y = y + 2 * grid_h + 8 + 8
     y = draw_also(draw, y)
