@@ -1,20 +1,24 @@
 #!/usr/bin/env python3
-"""Entrypoint: copy the pre-built poster to /output/entry.png.
+"""Entry point: copy the pre-rendered poster to the output directory.
 
-Standard library only. No network, no randomness: two runs write the
-same bytes, because entry.png is a fixed file in this repository.
+Standard library only. The poster itself is drawn by compose_poster.py
+during development; this program just copies the bundled entry.png so
+the sandboxed run is deterministic and needs no fonts or network.
 """
-
 import os
 import shutil
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 def main():
-    here = os.path.dirname(os.path.abspath(__file__))
-    source = os.path.join(here, "entry.png")
-    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
+    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "out")
     os.makedirs(out_dir, exist_ok=True)
-    shutil.copyfile(source, os.path.join(out_dir, "entry.png"))
+    src = os.path.join(HERE, "entry.png")
+    dst = os.path.join(out_dir, "entry.png")
+    shutil.copyfile(src, dst)
+    print("wrote", dst, os.path.getsize(dst), "bytes")
 
 
 if __name__ == "__main__":
